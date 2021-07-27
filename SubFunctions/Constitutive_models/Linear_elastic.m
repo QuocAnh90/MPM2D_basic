@@ -10,7 +10,7 @@ E = CModel_parameter(1);
 nu = CModel_parameter(2);
 
 % Elastic matrix
-D = [E/(1-nu.^2) E*nu/(1-nu.^2) 0; E*nu/(1-nu.^2) E/(1-nu.^2) 0; 0 0 E/(1-nu)];
+D = [E/(1-nu^2) E*nu/(1-nu^2) 0; E*nu/(1-nu^2) E/(1-nu^2) 0; 0 0 E/(1+nu)];
 
 % THis is the linear elastic model
         de_sp(1) = dESP(1,1);
