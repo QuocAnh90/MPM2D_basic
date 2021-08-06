@@ -20,9 +20,18 @@ function[v_ssp,x_sp,d_sp,F_sp,V_sp,s_sp,p_sp,r1_sp,r2_sp] = CPDI_solver(CModel,C
  nforce_si      = niforce_si + neforce_si + traction_si;
  nmomentum_si   = nmomentum_si + nforce_si*dt;
  
+ 
+ nvelo_si                = zeros(nodeCount,2);                   % Nodal Velocity
+ for n = 1:nodeCount
+     if nmass_si(n) > 0.00000001
+         nvelo_si(n,:) =  nmomentum_si(n,:)/nmass_si(n);
+     end
+ end
+ 
 % Boundary condition
 [nforce_si]     = Boundary_Dirichlet(nfbcx,nfbcy,fbcx,fbcy,nforce_si); % Boundary condition for nodal force
 [nmomentum_si]  = Boundary_Dirichlet(nfbcx,nfbcy,fbcx,fbcy,nmomentum_si); % Boundary condition for nodal force
+[nvelo_si] = Boundary_Dirichlet(nfbcx,nfbcy,fbcx,fbcy,nvelo_si); % Boundary condition for nodal force
 
 %% Update solid particle velocity and position
 [v_ssp,x_sp,d_sp] = Update_Particle_Position(NODES,dt,CONNECT,N,spCount,nmass_si,nforce_si,nmomentum_si,x_spo,v_ssp,x_sp,d_sp);
@@ -31,9 +40,9 @@ function[v_ssp,x_sp,d_sp,F_sp,V_sp,s_sp,p_sp,r1_sp,r2_sp] = CPDI_solver(CModel,C
 % displacement particle: d_sp
  
 %% Mapping nodal velocity back to node
-[nvelo_si] = Interpolate_velocity_back(NODES,nodeCount,spCount,CONNECT,m_sp,v_ssp,N,nmass_si);
+%[nvelo_si] = Interpolate_velocity_back(NODES,nodeCount,spCount,CONNECT,m_sp,v_ssp,N,nmass_si);
 % Boundary condition
-[nvelo_si] = Boundary_Dirichlet(nfbcx,nfbcy,fbcx,fbcy,nvelo_si); % Boundary condition for nodal force
+%[nvelo_si] = Boundary_Dirichlet(nfbcx,nfbcy,fbcx,fbcy,nvelo_si); % Boundary condition for nodal force
 
 %% Update effective stress
 [F_sp,V_sp,s_sp,p_sp] = Update_Stress(CModel,CModel_parameter,...
@@ -42,5 +51,3 @@ function[v_ssp,x_sp,d_sp,F_sp,V_sp,s_sp,p_sp,r1_sp,r2_sp] = CPDI_solver(CModel,C
 
 %% Update the topology of particles
 [r1_sp,r2_sp] = Update_topology(spCount,F_sp,r1_sp,r10_sp,r2_sp,r20_sp);
-
-test = 1;
